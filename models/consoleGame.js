@@ -5,12 +5,12 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class ConsoleGame extends Model {
     static associate(models) {
-      
     }
   }
   ConsoleGame.init({
     consoleId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       onDelete: 'CASCADE',
       references: {
         model: 'Consoles',
@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     gameId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       onDelete: 'CASCADE',
       references: {
         model: 'Games',

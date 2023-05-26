@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       onDelete: 'CASCADE',
       references: {
-        model: 'Console',
+        model: 'Consoles',
         key: 'id'
       }
     }

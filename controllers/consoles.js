@@ -15,7 +15,7 @@ const index = async (req, res) => {
       include: [
         {
           model: ExclusiveGame,
-          as: "exclusiveGames"
+          as: 'exclusiveGames'
         }, {
           model: Game,
           as: 'games',
@@ -25,6 +25,28 @@ const index = async (req, res) => {
     })
     res.status(200).json(consoles)
   } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
+const show = async (req, res) => {
+  try {
+    const console = await Console.findByPk(
+      req.params.consoleId, 
+      {
+        include: [{
+          model: ExclusiveGame,
+          as: 'exclusiveGames'
+        },{
+          model: Game,
+          as: 'games',
+          through: { attributes: []}
+        }],
+      }
+    )
+    res.status(200).json(console)
+  } catch (err) {
+    console.log(err)
     res.status(500).json(err)
   }
 }
@@ -61,10 +83,51 @@ const addExclusive = async (req, res) => {
   }
 }
 
+const indexExclusives = async (req, res) => {
+  try {
+    const exclusives = await ExclusiveGame.findAll({
+      where: { consoleId: req.params.consoleId }
+    })
+    res.status(200).json(exclusives)
+  } catch (err) {
+    console.log(err)
+    res.status(500).json(err)
+  }
+}
+
+const updateExclusive = async (req, res) => {
+  try {
+    req.body.exclusiveGameId = req.params.exclusiveGameId
+    const exclusive = await ExclusiveGame.update(
+      req.body,
+      {
+        where: { id: req.params.exclusiveGameId },
+        returning: true
+      }
+    )
+    res.status(200).json(exclusive)
+  } catch (err) {
+    console.log(err)
+    res.status(500).json(err)
+  }
+}
+
+const deleteExclusive = async (req, res) => {
+  try {
+    await ExclusiveGame.destroy({
+      where: { id: req.params.exclusiveGameId }
+    })
+    res.status(200).json(ExclusiveGame)
+  } catch (err) {
+    console.log(err)
+    res.status(500).json(err)
+  }
+}
+
 const associateGame = async (req, res) => {
   try {
     const { consoleId, gameId } = req.params
-    const association = await consolegame.create({
+    const association = await ConsoleGame.create({
       consoleId: consoleId,
       gameId: gameId
     })
@@ -75,11 +138,44 @@ const associateGame = async (req, res) => {
   }
 }
 
+const indexGamesByConsole = async (req, res) => {
+  try {
+    const gamesByConsole = await ConsoleGame.findAll({
+      where: { consoleId: req.params.consoleId }
+    })
+    res.status(200).json(gamesByConsole)
+  } catch (err) {
+    console.log(err)
+    res.status(500).json(err)    
+  }
+}
+
+const deleteAssociation = async (req, res) => {
+  try {
+    const { consoleId, gameId } = req.params
+    await ConsoleGame.destroy({
+      where: {
+        consoleId: req.params.consoleId,
+        gameId: req.params.gameId
+      }
+    })
+    res.status(200)
+  } catch (err) {
+    console.log(err)
+    res.status(500).json(err)    
+  }
+}
 module.exports = {
   create,
   index,
+  show,
   update,
   delete: deleteConsole,
   addExclusive,
-  associateGame
+  indexExclusives,
+  updateExclusive,
+  deleteExclusive,
+  associateGame,
+  indexGamesByConsole,
+  deleteAssociation,
 }

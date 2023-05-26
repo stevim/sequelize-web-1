@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('exclusiveGames', {
+    await queryInterface.createTable('ExclusiveGames', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -16,7 +16,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       consoleId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Consoles',
+          key: 'id'
+        }
       },
       createdAt: {
         allowNull: false,
